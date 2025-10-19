@@ -15,7 +15,7 @@ A privacy-focused personal development app that combines journaling, AI-powered 
 
 - **Client-Side Encryption**: All journal entries, insights, and chat messages are encrypted using AES-256-GCM before leaving your device
 - **Secure Storage**: Encryption keys are stored in iOS Keychain / Android Keystore
-- **Row-Level Security**: Database access is strictly controlled per user
+- **Row-Level Security**: Database access is strictly controlled per user - you can only see your own data
 - **Private by Default**: Your data is yours - not even the server can read your encrypted content
 
 ## Tech Stack
@@ -26,51 +26,30 @@ A privacy-focused personal development app that combines journaling, AI-powered 
 - **Authentication**: Supabase Auth with Google Sign-In
 - **Encryption**: AES-256-GCM with expo-crypto
 
-## Prerequisites
+## Quick Start
 
-- Node.js (v18 or higher)
-- npm or yarn
-- Expo CLI
-- iOS Simulator (macOS) or Android Emulator
-- Supabase account
-- Google Cloud Console account (for OAuth)
-- Google AI Studio account (for Gemini API)
+### 1. Clone the repository
 
-## Setup
+```bash
+git clone https://github.com/lucascarsonbrown/Inword.git
+cd Inword
+```
 
-### 1. Install Dependencies
+### 2. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 2. Environment Variables
-
-Create a `.env` file in the root directory (use `.env.example` as a template):
+### 3. Set up environment variables
 
 ```bash
-EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-EXPO_PUBLIC_GEMINI_API_KEY=your_gemini_api_key
+cp .env.example .env
 ```
 
-### 3. Database Setup
+That's it! The `.env.example` file already contains working credentials. Your data will be private thanks to Row Level Security.
 
-You'll need to set up the database schema in your Supabase project. The SQL files are available locally (not in git for security):
-- Base schema for tables and RLS policies
-- Encryption migration for encrypted columns
-- Private knowledge base schema
-
-Contact the project owner for access to these files.
-
-### 4. Configure Authentication
-
-Set up Google OAuth in Supabase:
-1. Enable Google provider in Supabase Auth settings
-2. Add redirect URLs (including `inword://auth/callback` for mobile)
-3. Configure Google OAuth credentials from Google Cloud Console
-
-### 5. Start the App
+### 4. Start the app
 
 ```bash
 npx expo start
@@ -80,6 +59,15 @@ Then:
 - Press `i` for iOS simulator
 - Press `a` for Android emulator
 - Scan QR code with Expo Go app on your phone
+
+## How It Works
+
+The app uses a shared backend (Supabase) but your data is completely isolated:
+
+1. **Sign in with Google** - Create your own account
+2. **All your data is encrypted** - Before it leaves your device
+3. **Row Level Security** - The database ensures you can only access your own data
+4. **Privacy First** - Even if someone else uses the same backend, they can't see your journal entries
 
 ## Development
 
@@ -111,12 +99,11 @@ npx expo build:ios
 npx expo build:android
 ```
 
-## Security Notes
+## Important Notes
 
-- Never commit `.env` files
-- Rotate API keys if they are exposed
-- The app uses client-side encryption - if users lose their device encryption key, their data cannot be recovered
-- Supabase anon key is safe to use in the client (protected by RLS policies)
+- **Your encryption keys never leave your device** - If you uninstall the app, you'll lose access to your encrypted data
+- **Each user gets their own isolated data** - Enforced by database-level security policies
+- **The shared credentials are safe** - They only allow authenticated access to your own data
 
 ## License
 
@@ -124,4 +111,4 @@ Private project - All rights reserved
 
 ## Contact
 
-For questions or access to setup files, contact the repository owner.
+For questions or issues, open an issue on GitHub or contact the repository owner.
