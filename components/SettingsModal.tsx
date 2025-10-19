@@ -6,12 +6,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "expo-router";
 
 interface SettingsModalProps {
   visible: boolean;
@@ -19,30 +17,7 @@ interface SettingsModalProps {
 }
 
 export default function SettingsModal({ visible, onClose }: SettingsModalProps) {
-  const { user, signOut } = useAuth();
-  const router = useRouter();
-
-  const handleSignOut = async () => {
-    try {
-      console.log("🔓 Starting sign out...");
-      onClose();
-      await signOut();
-      console.log("✅ Sign out successful, navigating to /auth");
-
-      // Force navigation to auth page
-      setTimeout(() => {
-        router.replace("/auth");
-      }, 100);
-    } catch (error) {
-      console.error("❌ Sign out error:", error);
-      Alert.alert("Error", "Failed to sign out. Please try again.");
-    }
-  };
-
-  const handleSignIn = () => {
-    onClose();
-    router.push("/auth");
-  };
+  const { user } = useAuth();
 
   return (
     <Modal
@@ -66,66 +41,27 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
             </View>
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-              {/* Account Section */}
+              {/* Device Section */}
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Account</Text>
+                <Text style={styles.sectionTitle}>Storage</Text>
 
-                {user ? (
-                  <>
-                    <View style={styles.userInfo}>
-                      <View style={styles.userIconContainer}>
-                        <Ionicons name="person-circle" size={60} color="#E0C3FC" />
-                      </View>
-                      <View style={styles.userDetails}>
-                        <Text style={styles.userEmail}>{user.email}</Text>
-                        <Text style={styles.userStatus}>Signed In</Text>
-                      </View>
-                    </View>
+                <View style={styles.userInfo}>
+                  <View style={styles.userIconContainer}>
+                    <Ionicons name="phone-portrait" size={60} color="#E0C3FC" />
+                  </View>
+                  <View style={styles.userDetails}>
+                    <Text style={styles.userEmail}>Device Storage</Text>
+                    <Text style={styles.userStatus}>All data stored locally & encrypted</Text>
+                  </View>
+                </View>
 
-                    <TouchableOpacity
-                      style={styles.signOutButton}
-                      onPress={() => {
-                        console.log("🖱️ Sign out button pressed");
-                        handleSignOut();
-                      }}
-                    >
-                      <LinearGradient
-                        colors={["#e74c3c", "#c0392b"]}
-                        style={styles.signOutButtonGradient}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                      >
-                        <Ionicons name="log-out" size={20} color="#fff" />
-                        <Text style={styles.signOutButtonText}>Sign Out</Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
-                  </>
-                ) : (
-                  <>
-                    <View style={styles.notSignedInContainer}>
-                      <Ionicons name="person-circle-outline" size={60} color="#8EA7E9" />
-                      <Text style={styles.notSignedInText}>Not signed in</Text>
-                      <Text style={styles.notSignedInSubtext}>
-                        Sign in to sync your data across devices
-                      </Text>
-                    </View>
-
-                    <TouchableOpacity
-                      style={styles.signInButton}
-                      onPress={handleSignIn}
-                    >
-                      <LinearGradient
-                        colors={["#667eea", "#764ba2"]}
-                        style={styles.signInButtonGradient}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                      >
-                        <Ionicons name="log-in" size={20} color="#fff" />
-                        <Text style={styles.signInButtonText}>Sign In</Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
-                  </>
-                )}
+                <View style={styles.infoBox}>
+                  <Ionicons name="shield-checkmark" size={24} color="#4CAF50" />
+                  <View style={styles.infoTextContainer}>
+                    <Text style={styles.infoLabel}>End-to-End Encryption</Text>
+                    <Text style={styles.infoValue}>Your journal is encrypted on this device</Text>
+                  </View>
+                </View>
               </View>
 
               {/* App Info Section */}
@@ -295,6 +231,16 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#fff",
     letterSpacing: 0.5,
+  },
+  infoBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: "rgba(76, 175, 80, 0.3)",
   },
   infoItem: {
     flexDirection: "row",

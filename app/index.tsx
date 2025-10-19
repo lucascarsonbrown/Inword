@@ -39,17 +39,13 @@ export default function Index() {
     );
   }
 
-  if (!user) {
-    console.log("❌ Redirecting to auth - No user found");
-    return <Redirect href="/auth" />;
-  }
-
+  // No auth required - anonymous user is created automatically
   if (!completedOnboarding) {
-    console.log("🚀 Redirecting to onboarding - New user");
+    console.log("🚀 Redirecting to onboarding - First time user");
     return <Redirect href="/onboarding" />;
   }
 
-  console.log("✅ Redirecting to journal - User is logged in and onboarded");
+  console.log("✅ Redirecting to journal - Returning user");
   return <Redirect href="/(tabs)/journal" />;
 }
 
