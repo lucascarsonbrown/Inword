@@ -1,50 +1,127 @@
-# Welcome to your Expo app 👋
+# InWord
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A privacy-focused personal development app that combines journaling, AI-powered insights, goal tracking, and vision boarding to help you reflect, grow, and achieve your goals.
 
-## Get started
+## Features
 
-1. Install dependencies
+- **Journal**: Daily journaling with mood tracking and encrypted storage
+- **Insights**: AI-powered reflections and analysis of your journal entries
+- **Vision Board**: Visual goal setting and tracking
+- **AI Chat**: Conversational AI assistant powered by Google Gemini
+- **Private Knowledge Base**: Your personal insights and patterns, securely stored
+- **End-to-End Encryption**: All sensitive data is encrypted on your device before being stored
 
-   ```bash
-   npm install
-   ```
+## Privacy & Security
 
-2. Start the app
+- **Client-Side Encryption**: All journal entries, insights, and chat messages are encrypted using AES-256-GCM before leaving your device
+- **Secure Storage**: Encryption keys are stored in iOS Keychain / Android Keystore
+- **Row-Level Security**: Database access is strictly controlled per user
+- **Private by Default**: Your data is yours - not even the server can read your encrypted content
 
-   ```bash
-   npx expo start
-   ```
+## Tech Stack
 
-In the output, you'll find options to open the app in a
+- **Frontend**: React Native with Expo
+- **Backend**: Supabase (PostgreSQL)
+- **AI**: Google Gemini API
+- **Authentication**: Supabase Auth with Google Sign-In
+- **Encryption**: AES-256-GCM with expo-crypto
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Prerequisites
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- Node.js (v18 or higher)
+- npm or yarn
+- Expo CLI
+- iOS Simulator (macOS) or Android Emulator
+- Supabase account
+- Google Cloud Console account (for OAuth)
+- Google AI Studio account (for Gemini API)
 
-## Get a fresh project
+## Setup
 
-When you're ready, run:
+### 1. Install Dependencies
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Environment Variables
 
-## Learn more
+Create a `.env` file in the root directory (use `.env.example` as a template):
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+EXPO_PUBLIC_GEMINI_API_KEY=your_gemini_api_key
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### 3. Database Setup
 
-## Join the community
+You'll need to set up the database schema in your Supabase project. The SQL files are available locally (not in git for security):
+- Base schema for tables and RLS policies
+- Encryption migration for encrypted columns
+- Private knowledge base schema
 
-Join our community of developers creating universal apps.
+Contact the project owner for access to these files.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### 4. Configure Authentication
+
+Set up Google OAuth in Supabase:
+1. Enable Google provider in Supabase Auth settings
+2. Add redirect URLs (including `inword://auth/callback` for mobile)
+3. Configure Google OAuth credentials from Google Cloud Console
+
+### 5. Start the App
+
+```bash
+npx expo start
+```
+
+Then:
+- Press `i` for iOS simulator
+- Press `a` for Android emulator
+- Scan QR code with Expo Go app on your phone
+
+## Development
+
+The app uses Expo Router for file-based routing. Key directories:
+
+- `app/` - Screen components and routes
+- `components/` - Reusable UI components
+- `contexts/` - React Context providers (Auth, App state)
+- `services/` - Backend services (database, AI, encryption)
+- `lib/` - Utility libraries (Supabase client, crypto)
+- `config/` - Configuration files (AI prompts)
+- `types/` - TypeScript type definitions
+
+## Key Services
+
+- **Authentication**: `contexts/AuthContext.tsx`
+- **Database Operations**: `services/database.ts`
+- **AI Integration**: `services/gemini.ts`
+- **Encryption**: `lib/encryption.ts`
+- **Knowledge Base**: `services/kb-manager.ts`
+
+## Building for Production
+
+```bash
+# iOS
+npx expo build:ios
+
+# Android
+npx expo build:android
+```
+
+## Security Notes
+
+- Never commit `.env` files
+- Rotate API keys if they are exposed
+- The app uses client-side encryption - if users lose their device encryption key, their data cannot be recovered
+- Supabase anon key is safe to use in the client (protected by RLS policies)
+
+## License
+
+Private project - All rights reserved
+
+## Contact
+
+For questions or access to setup files, contact the repository owner.
