@@ -306,7 +306,12 @@ export default function OnboardingScreen() {
 
               <View style={styles.sliderContainer}>
                 <Text style={styles.sliderLabel}>
-                  Timeframe: {goal.timeframe} {goal.timeframe === 1 ? "month" : "months"}
+                  Timeframe: {goal.timeframe < 12
+                    ? `${goal.timeframe} ${goal.timeframe === 1 ? "month" : "months"}`
+                    : goal.timeframe % 12 === 0
+                      ? `${goal.timeframe / 12} ${goal.timeframe === 12 ? "year" : "years"}`
+                      : `${Math.floor(goal.timeframe / 12)} ${Math.floor(goal.timeframe / 12) === 1 ? "year" : "years"}, ${goal.timeframe % 12} ${goal.timeframe % 12 === 1 ? "month" : "months"}`
+                  }
                 </Text>
                 <Slider
                   style={styles.slider}
