@@ -34,6 +34,13 @@ yarn-error.*
 .env
 .env*.local
 
+# Private documentation and scripts with sensitive info
+*_SETUP.md
+CHECK_DATABASE.md
+FIX_GOOGLE_REDIRECT.md
+scripts/verify-database.ts
+supabase-schema*.sql
+
 # typescript
 *.tsbuildinfo
 
