@@ -25,6 +25,8 @@ interface Goal {
 
 export default function OnboardingScreen() {
   const [currentStep, setCurrentStep] = useState(0);
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
   const [goals, setGoals] = useState<Goal[]>([
     { text: "", timeframe: 12, importance: 3 },
     { text: "", timeframe: 12, importance: 3 },
@@ -70,7 +72,7 @@ export default function OnboardingScreen() {
       }
 
       // Insert all goals into database
-      const { error } = await supabase.from("goals").insert(
+      const { error: goalsError } = await supabase.from("goals").insert(
         validGoals.map((goal) => ({
           user_id: user.id,
           text: goal.text,
@@ -79,9 +81,48 @@ export default function OnboardingScreen() {
         }))
       );
 
-      if (error) {
-        console.error("Error saving goals:", error);
-        throw error;
+      if (goalsError) {
+        console.error("Error saving goals:", goalsError);
+        throw goalsError;
+      }
+
+      // Save name and age to knowledge base
+      const kbData = {
+        user_id: user.id,
+        general: {
+          name_or_alias: name.trim() || "",
+          bio: age.trim() ? [`${age} years old`] : [],
+          relationships: [],
+          work_school: [],
+          routines: [],
+          preferences: [],
+          values: [],
+          triggers_boundaries: [],
+        },
+        state_recent: {
+          dominant_emotions: [],
+          mood_score_avg: null,
+          highs: [],
+          lows: [],
+          stressors: [],
+          protective_factors: [],
+          red_flags: [],
+          suggested_focus: [],
+          window: "last_30_days",
+        },
+        goals_progress: {
+          goals: [],
+          updated_at: new Date().toISOString(),
+        },
+      };
+
+      const { error: kbError } = await supabase
+        .from("user_private_kb")
+        .insert(kbData);
+
+      if (kbError) {
+        console.error("Error saving KB:", kbError);
+        // Don't throw - KB is optional
       }
 
       // Navigate to home
@@ -137,6 +178,90 @@ export default function OnboardingScreen() {
         <Ionicons name="star" size={12} color="rgba(224, 195, 252, 0.3)" />
         <Ionicons name="star" size={8} color="rgba(224, 195, 252, 0.2)" />
         <Ionicons name="star" size={10} color="rgba(224, 195, 252, 0.25)" />
+      </View>
+    </View>
+  );
+
+  const renderPersonalInfo = () => (
+    <View style={styles.stepContainer}>
+      <View style={styles.header}>
+        <View style={styles.celestialIcon}>
+          <Ionicons name="person" size={32} color="#E0C3FC" />
+          <View style={styles.sparkleGlow} />
+        </View>
+        <Text style={styles.title}>Tell Us About You</Text>
+        <Text style={styles.subtitle}>
+          Help us personalize your experience
+        </Text>
+      </View>
+
+      <View style={styles.formContent}>
+        <View style={styles.inputCard}>
+          <LinearGradient
+            colors={["rgba(102, 126, 234, 0.1)", "rgba(118, 75, 162, 0.1)"]}
+            style={styles.inputCardGradient}
+          >
+            <Text style={styles.inputLabel}>What's your name?</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Enter your name or preferred name"
+              placeholderTextColor="#8EA7E9"
+              value={name}
+              onChangeText={setName}
+              autoCapitalize="words"
+            />
+          </LinearGradient>
+        </View>
+
+        <View style={styles.inputCard}>
+          <LinearGradient
+            colors={["rgba(102, 126, 234, 0.1)", "rgba(118, 75, 162, 0.1)"]}
+            style={styles.inputCardGradient}
+          >
+            <Text style={styles.inputLabel}>How old are you?</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Enter your age"
+              placeholderTextColor="#8EA7E9"
+              value={age}
+              onChangeText={setAge}
+              keyboardType="numeric"
+            />
+          </LinearGradient>
+        </View>
+
+        <View style={styles.privacyNote}>
+          <Ionicons name="lock-closed" size={16} color="#8EA7E9" />
+          <Text style={styles.privacyText}>
+            This information stays private and encrypted on your device
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.buttonGroup}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => setCurrentStep(0)}
+        >
+          <Ionicons name="arrow-back" size={20} color="#8EA7E9" />
+          <Text style={styles.backButtonText}>Back</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.submitButton, (!name.trim() || !age.trim()) && styles.submitButtonDisabled]}
+          onPress={() => setCurrentStep(2)}
+          disabled={!name.trim() || !age.trim()}
+        >
+          <LinearGradient
+            colors={(!name.trim() || !age.trim()) ? ["#3a3a52", "#2d2d44"] : ["#667eea", "#764ba2"]}
+            style={styles.submitButtonGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <Text style={styles.submitButtonText}>Continue</Text>
+            <Ionicons name="arrow-forward" size={20} color="#fff" />
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -227,7 +352,7 @@ export default function OnboardingScreen() {
       <View style={styles.buttonGroup}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => setCurrentStep(0)}
+          onPress={() => setCurrentStep(1)}
         >
           <Ionicons name="arrow-back" size={20} color="#8EA7E9" />
           <Text style={styles.backButtonText}>Back</Text>
@@ -267,7 +392,9 @@ export default function OnboardingScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
       >
-        {currentStep === 0 ? renderWelcome() : renderGoalsForm()}
+        {currentStep === 0 && renderWelcome()}
+        {currentStep === 1 && renderPersonalInfo()}
+        {currentStep === 2 && renderGoalsForm()}
       </KeyboardAvoidingView>
     </LinearGradient>
   );
@@ -489,5 +616,49 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 20,
+  },
+  formContent: {
+    flex: 1,
+    justifyContent: "center",
+    gap: 20,
+  },
+  inputCard: {
+    borderRadius: 16,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(224, 195, 252, 0.2)",
+  },
+  inputCardGradient: {
+    padding: 20,
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#E0C3FC",
+    marginBottom: 12,
+  },
+  textInput: {
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(224, 195, 252, 0.2)",
+    padding: 16,
+    fontSize: 16,
+    color: "#fff",
+  },
+  privacyNote: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: 12,
+    paddingHorizontal: 20,
+  },
+  privacyText: {
+    fontSize: 13,
+    color: "#8EA7E9",
+    fontStyle: "italic",
+    textAlign: "center",
+    flex: 1,
   },
 });
