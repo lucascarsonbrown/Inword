@@ -34,6 +34,9 @@ yarn-error.*
 .env
 .env*.local
 
+# Edge Functions env (contains API keys)
+supabase/.env
+
 # Private documentation and scripts with sensitive info
 *_SETUP.md
 CHECK_DATABASE.md
